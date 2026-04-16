@@ -16,11 +16,16 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [purchaseLoading, setPurchaseLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [transactions, setTransactions] = useState<any[]>([]);
 
   const fetchData = async () => {
     try {
-      const res = await api.get(`/users/${userData.id}/achievements`);
-      setData(res.data);
+      const [achievementsRes, transactionsRes] = await Promise.all([
+        api.get(`/users/${userData.id}/achievements`),
+        api.get('/transactions')
+      ]);
+      setData(achievementsRes.data);
+      setTransactions(transactionsRes.data.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -48,7 +53,6 @@ export default function Dashboard() {
     try {
       const res = await api.post("/purchase", { amount: parseInt(purchaseAmount) });
       
-      // Update balance from purchase response as requested
       if (res.data.balance !== undefined) {
         setBalance(res.data.balance);
       }
@@ -86,7 +90,7 @@ export default function Dashboard() {
           <div className="flex justify-between h-20 items-center">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-[#00A859] rounded-lg flex items-center justify-center font-bold text-white">B</div>
-              <span className="text-xl font-bold text-gray-900 tracking-tight">Bumpa Loyalty</span>
+              <span className="text-xl font-bold text-gray-900 tracking-tight">Bumpa</span>
             </div>
             <div className="flex items-center space-x-6">
               <div className="text-right hidden sm:block">
@@ -108,7 +112,7 @@ export default function Dashboard() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Alerts Section (Positioned fixed via Alert component) */}
+        {/* Alerts Section */}
         {message && (
           <Alert 
             type={message.type} 
@@ -118,9 +122,9 @@ export default function Dashboard() {
           />
         )}
 
-        {/* Hero Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
+            {/* Hero Section */}
             <div className="bg-white rounded-2xl p-10 border border-gray-100 shadow-sm relative overflow-hidden">
               <div className="relative z-[1]">
                 <h2 className="text-3xl font-extrabold text-gray-900 mb-2">Welcome, {userData.name.split(' ')[0]}!</h2>
@@ -132,35 +136,102 @@ export default function Dashboard() {
                <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-green-50/50 to-transparent"></div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
               <StatCard 
                 label="Achievements Unlocked" 
                 value={data.unlocked_achievements.length} 
                 icon="🏆"
+                centered={true}
               />
               
-              <div className="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm">
-                <div className="flex items-center justify-between mb-6">
+              <div className="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm flex flex-col max-h-[400px]">
+                <div className="flex items-center justify-between mb-6 shrink-0">
                   <h3 className="font-bold text-gray-400 uppercase tracking-tighter text-xs">Achievement History</h3>
                   <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center text-[#00A859] text-lg font-bold">✓</div>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar">
                   {data.unlocked_achievements.length > 0 ? (
                     data.unlocked_achievements.map((a: string, i: number) => (
-                      <div key={i} className="flex items-center justify-between p-4 bg-gray-50/50 rounded-xl border border-gray-100 group hover:border-[#00A859]/30 transition-all">
+                      <div key={i} className="flex items-center justify-between p-4 bg-gray-50/50 rounded-xl border border-gray-100 group hover:border-[#00A859]/30 transition-all shrink-0">
                         <span className="font-bold text-gray-900">{a}</span>
                         <span className="text-xs bg-[#00A859] text-white px-2 py-1 rounded font-bold uppercase">Unlocked</span>
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-400 text-sm font-medium italic py-4">No awards yet. Start shopping!</p>
+                    <p className="text-gray-400 text-sm font-medium italic py-4 text-center">No awards yet. Start shopping!</p>
                   )}
                 </div>
+              </div>
+            </div>
+
+            {/* Purchase History Section */}
+            <div className="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h3 className="text-xl font-extrabold text-gray-900">Purchase History</h3>
+                  <p className="text-sm text-gray-500 font-medium">Your recent financial activities</p>
+                </div>
+                <div className="flex space-x-2">
+                   <div className="flex items-center space-x-1">
+                      <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                      <span className="text-[10px] font-bold text-gray-400 uppercase">Cashback</span>
+                   </div>
+                   <div className="flex items-center space-x-1">
+                      <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                      <span className="text-[10px] font-bold text-gray-400 uppercase">Purchase</span>
+                   </div>
+                </div>
+              </div>
+              
+              <div className="overflow-x-auto max-h-[500px] overflow-y-auto custom-scrollbar">
+                <table className="w-full">
+                  <thead>
+                    <tr className="text-left border-b border-gray-50 sticky top-0 bg-white z-[1]">
+                      <th className="pb-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Transaction</th>
+                      <th className="pb-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date</th>
+                      <th className="pb-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {transactions.length > 0 ? (
+                      transactions.map((t) => (
+                        <tr key={t.id} className="group hover:bg-gray-50/50 transition-colors">
+                          <td className="py-4">
+                            <div className="flex items-center space-x-3">
+                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold ${t.type === 'cashback' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                                {t.type === 'cashback' ? '+' : '-'}
+                              </div>
+                              <div>
+                                <p className="text-sm font-bold text-gray-900 capitalize">{t.type}</p>
+                                <p className="text-[10px] text-gray-400 font-bold uppercase">Transaction ID: #{t.id}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-4">
+                            <p className="text-sm text-gray-600 font-medium">{new Date(t.created_at).toLocaleDateString()}</p>
+                          </td>
+                          <td className="py-4 text-right">
+                            <p className={`text-sm font-extrabold ${t.type === 'cashback' ? 'text-green-600' : 'text-gray-900'}`}>
+                              {t.type === 'cashback' ? '+' : '-'}₦{parseFloat(t.amount).toLocaleString()}
+                            </p>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={3} className="py-10 text-center text-gray-400 italic font-medium">
+                          No transactions found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
 
           <div className="space-y-8">
+            {/* Loyalty Level */}
             <div className="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm">
               <h3 className="font-bold text-gray-400 uppercase tracking-tighter text-xs mb-8">Loyalty Level</h3>
               <div className="flex flex-col items-center text-center">
@@ -168,7 +239,7 @@ export default function Dashboard() {
                   <div className="text-6xl">{data.current_badge ? "⭐" : "🌱"}</div>
                 </div>
                 <p className="text-2xl font-extrabold text-gray-900 mb-1">
-                  {data.current_badge || "Bronze Member"}
+                  {data.current_badge || ""}
                 </p>
                 <div className="w-full h-px bg-gray-100 my-8"></div>
                 <div className="w-full text-left space-y-4">
@@ -186,6 +257,7 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* Quick Action */}
             <div className="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm">
               <h3 className="font-bold text-gray-400 uppercase tracking-tighter text-xs mb-8">Quick Action</h3>
               <form onSubmit={makePurchase} className="space-y-6">

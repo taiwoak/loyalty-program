@@ -40,7 +40,7 @@ export default function Login() {
                </div>
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h1>
-            <p className="text-gray-500 font-medium tracking-tight">Get back to managing your business like a pro.</p>
+            <p className="text-gray-500 font-medium tracking-tight">Get back to the loyalty program</p>
           </div>
 
           {error && (
@@ -68,26 +68,13 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              <div className="flex justify-end mt-2">
-                <Link to="#" className="text-sm font-semibold text-[#00A859] hover:text-[#008e4b]">Forgot Password?</Link>
-              </div>
             </div>
 
             <Button type="submit" loading={loading} loadingText="Signing in..." variant="primary" className="py-4">
               Login
             </Button>
           </form>
-
-          <div className="relative my-10">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500 font-medium">or</span>
-            </div>
-          </div>
-
-          <p className="text-center text-gray-600 font-medium">
+          <p className="text-center text-gray-600 font-medium py-2">
             Don't have an account? <Link to="/register" className="text-[#00A859] hover:underline font-bold ml-1">Sign up</Link>
           </p>
         </div>
@@ -95,4 +82,4 @@ export default function Login() {
     </div>
   );
 }
-
+

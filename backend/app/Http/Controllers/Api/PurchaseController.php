@@ -24,10 +24,16 @@ class PurchaseController extends Controller
             ], 400);
         }
 
-        // Create purchase
+        // Create purchase and record transaction
         Purchase::create([
             'user_id' => $user->id,
             'amount' => $request->amount,
+        ]);
+
+        \App\Models\Transaction::create([
+            'user_id' => $user->id,
+            'amount' => $request->amount,
+            'type' => 'purchase',
         ]);
 
         // Deduct balance

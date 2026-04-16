@@ -3,42 +3,40 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Purchase;
-use App\Events\UserPurchaseEvent;
+use App\Models\User;
+use App\Models\Achievement;
+use App\Models\Badge;
 
-class PurchaseController extends Controller
+class AchievementController extends Controller
 {
-    public function store(Request $request)
+    public function index(User $user)
     {
-        $request->validate([
-            'amount' => 'required|integer|min:1',
-        ]);
-
-        $user = $request->user();
-
-        if ($user->balance < $request->amount) {
+        if (auth()->id() !== $user->id) {
             return response()->json([
-                'message' => 'Insufficient balance'
-            ], 400);
+                'message' => 'Forbidden access to this resource',
+            ], 403);
         }
 
-        // Create purchase
-        Purchase::create([
-            'user_id' => $user->id,
-            'amount' => $request->amount,
-        ]);
+        $unlockedAchievements = $user->achievements->pluck('name');
 
-        // Deduct balance
-        $user->balance -= $request->amount;
-        $user->save();
+        $nextAchievements = Achievement::whereNotIn('id', $user->achievements->pluck('id'))
+            ->pluck('name');
 
-        // Fire event
-        event(new UserPurchaseEvent($user));
+        $currentBadge = $user->badges()->orderByDesc('required_achievements')->first();
+
+        $nextBadge = Badge::where('required_achievements', '>', $user->achievements()->count())
+            ->orderBy('required_achievements')
+            ->first();
 
         return response()->json([
-            'message' => 'Purchase successful',
-            'balance' => $user->balance,
+            'unlocked_achievements' => $unlockedAchievements,
+            'next_available_achievements' => $nextAchievements,
+            'current_badge' => $currentBadge?->name,
+            'next_badge' => $nextBadge?->name,
+            'remaining_to_unlock_next_badge' =>
+                $nextBadge
+                    ? $nextBadge->required_achievements - $user->achievements()->count()
+                    : 0,
         ]);
     }
 }

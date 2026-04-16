@@ -16,6 +16,7 @@ class PurchaseController extends Controller
         ]);
 
         $user = $request->user();
+        $initialBadgeCount = $user->badges()->count();
 
         if ($user->balance < $request->amount) {
             return response()->json([
@@ -36,9 +37,22 @@ class PurchaseController extends Controller
         // Fire event
         event(new UserPurchaseEvent($user));
 
-        return response()->json([
+        // Refresh user to get updated balance and badge info from listeners
+        $user->refresh();
+
+        $response = [
             'message' => 'Purchase successful',
             'balance' => $user->balance,
-        ]);
+        ];
+
+        // Check if a new badge was unlocked during the event
+        if ($user->badges()->count() > $initialBadgeCount) {
+            $latestBadge = $user->badges()->latest()->first();
+            $response['cashback'] = "Congratulations! You unlocked the {$latestBadge->name} badge and earned ₦300 cashback.";
+        } else {
+            $response['cashback'] = null;
+        }
+
+        return response()->json($response);
     }
 }

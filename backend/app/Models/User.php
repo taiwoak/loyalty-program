@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens; 
 use Illuminate\Notifications\Notifiable;
 
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens, Notifiable;
 
     protected $fillable = [
         'name',
@@ -23,6 +23,13 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+        ];
+    }
+
     public function purchases()
     {
         return $this->hasMany(Purchase::class);
@@ -30,14 +37,22 @@ class User extends Authenticatable
 
     public function achievements()
     {
-        return $this->belongsToMany(Achievement::class)
-                    ->withTimestamps();
+        return $this->belongsToMany(
+            Achievement::class,
+            'user_achievements',
+            'user_id',
+            'achievement_id'
+        )->withTimestamps();
     }
 
     public function badges()
     {
-        return $this->belongsToMany(Badge::class)
-                    ->withTimestamps();
+        return $this->belongsToMany(
+            Badge::class,
+            'user_badges',
+            'user_id',
+            'badge_id'
+        )->withTimestamps();
     }
 
     public function hasAchievement($achievementId)

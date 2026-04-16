@@ -12,16 +12,17 @@ export default function Button({
   ...props 
 }: ButtonProps) {
   const variants = {
-    primary: "from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 shadow-green-500/20",
-    secondary: "bg-black hover:bg-slate-900 text-white border border-white/10",
-    success: "from-green-600 to-emerald-700 hover:from-green-500 hover:to-emerald-600 shadow-green-500/20",
+    primary: "bg-[#00A859] hover:bg-[#008e4b] text-white shadow-sm",
+    secondary: "bg-black hover:bg-zinc-900 text-white",
+    success: "bg-[#00A859] hover:bg-[#008e4b] text-white shadow-sm",
+    outline: "bg-white border border-[#00A859] text-[#00A859] hover:bg-green-50",
   };
 
   return (
     <button
       {...props}
       disabled={loading || props.disabled}
-      className={`w-full bg-gradient-to-r ${variants[variant]} text-white font-semibold py-3 rounded-xl shadow-lg transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex items-center justify-center ${props.className || ""}`}
+      className={`w-full ${variants[variant]} font-semibold py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex items-center justify-center ${props.className || ""}`}
     >
       {loading ? (
         <>

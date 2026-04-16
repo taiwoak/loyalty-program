@@ -28,21 +28,27 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#F9FAFB] p-4 font-sans">
       <div className="w-full max-w-md">
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-2xl shadow-2xl">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-extrabold text-white tracking-tight mb-2">Create Account</h1>
-            <p className="text-green-400/70">Join our loyalty program today</p>
+        <div className="bg-white p-10 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
+          <div className="mb-10 text-center">
+            <div className="flex justify-center mb-6">
+               <div className="flex items-center space-x-2">
+                 <div className="w-10 h-10 bg-[#00A859] rounded-lg flex items-center justify-center font-bold text-white text-xl">B</div>
+                 <span className="text-2xl font-bold text-gray-900 tracking-tight">Bumpa</span>
+               </div>
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
+            <p className="text-gray-500 font-medium tracking-tight">Join our loyalty program today.</p>
           </div>
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/50 text-red-200 p-3 rounded-lg text-sm mb-6 text-center animate-pulse">
+            <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-lg text-sm mb-8 text-center font-medium">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleRegister} className="space-y-5">
+          <form onSubmit={handleRegister} className="space-y-6">
             <Input
               label="Full Name"
               type="text"
@@ -50,7 +56,6 @@ export default function Register() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="focus:ring-green-500/50"
             />
 
             <Input
@@ -60,7 +65,6 @@ export default function Register() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="focus:ring-green-500/50"
             />
 
             <Input
@@ -70,19 +74,15 @@ export default function Register() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="focus:ring-green-500/50"
             />
 
-            <Button type="submit" loading={loading} loadingText="Creating Account..." variant="primary">
-              Sign Up
-              <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-              </svg>
+            <Button type="submit" loading={loading} loadingText="Creating Account..." variant="primary" className="py-4">
+              Create Account
             </Button>
           </form>
 
-          <p className="text-center text-sm text-slate-400 mt-8">
-            Already have an account? <Link to="/" className="text-green-500 hover:text-green-400 transition-colors">Sign in</Link>
+          <p className="text-center text-gray-600 font-medium mt-10">
+            Already have an account? <Link to="/" className="text-[#00A859] hover:underline font-bold ml-1">Sign in</Link>
           </p>
         </div>
       </div>

@@ -29,51 +29,66 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#F9FAFB] p-4 font-sans">
       <div className="w-full max-w-md">
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-2xl shadow-2xl">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-extrabold text-white tracking-tight mb-2">Welcome Back</h1>
-            <p className="text-green-400/70">Sign in to your loyalty account</p>
+        <div className="bg-white p-10 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
+          <div className="mb-10 text-center">
+            <div className="flex justify-center mb-6">
+               <div className="flex items-center space-x-2">
+                 <div className="w-10 h-10 bg-[#00A859] rounded-lg flex items-center justify-center font-bold text-white text-xl">B</div>
+                 <span className="text-2xl font-bold text-gray-900 tracking-tight">Bumpa</span>
+               </div>
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h1>
+            <p className="text-gray-500 font-medium tracking-tight">Get back to managing your business like a pro.</p>
           </div>
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/50 text-red-200 p-3 rounded-lg text-sm mb-6 text-center animate-pulse">
+            <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-lg text-sm mb-8 text-center font-medium">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleLogin} className="space-y-6">
             <Input
               label="Email Address"
               type="email"
-              placeholder="name@company.com"
+              placeholder="you@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="focus:ring-green-500/50"
             />
 
-            <Input
-              label="Password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="focus:ring-green-500/50"
-            />
+            <div className="relative">
+              <Input
+                label="Password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <div className="flex justify-end mt-2">
+                <Link to="#" className="text-sm font-semibold text-[#00A859] hover:text-[#008e4b]">Forgot Password?</Link>
+              </div>
+            </div>
 
-            <Button type="submit" loading={loading} loadingText="Signing in..." variant="primary">
-              Sign In
-              <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
+            <Button type="submit" loading={loading} loadingText="Signing in..." variant="primary" className="py-4">
+              Login
             </Button>
           </form>
 
-          <p className="text-center text-sm text-slate-400 mt-8">
-            Don't have an account? <Link to="/register" className="text-green-500 hover:text-green-400 transition-colors">Sign up</Link>
+          <div className="relative my-10">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-gray-500 font-medium">or</span>
+            </div>
+          </div>
+
+          <p className="text-center text-gray-600 font-medium">
+            Don't have an account? <Link to="/register" className="text-[#00A859] hover:underline font-bold ml-1">Sign up</Link>
           </p>
         </div>
       </div>

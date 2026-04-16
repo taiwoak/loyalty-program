@@ -9,8 +9,17 @@ use App\Models\Badge;
 
 class AchievementController extends Controller
 {
-    public function index(User $user)
+    public function index($user)
     {
+        // Validate if user parameter is an integer
+        if (!ctype_digit((string)$user)) {
+            return response()->json([
+                'message' => 'invalid user',
+            ], 400);
+        }
+
+        $user = User::findOrFail($user);
+
         if (auth()->id() !== $user->id) {
             return response()->json([
                 'message' => 'Forbidden access to this resource',

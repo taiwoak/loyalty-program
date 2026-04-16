@@ -144,12 +144,12 @@ export default function Dashboard() {
                 centered={true}
               />
               
-              <div className="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm flex flex-col max-h-[400px]">
+              <div className="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm flex flex-col">
                 <div className="flex items-center justify-between mb-6 shrink-0">
                   <h3 className="font-bold text-gray-400 uppercase tracking-tighter text-xs">Achievement History</h3>
                   <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center text-[#00A859] text-lg font-bold">✓</div>
                 </div>
-                <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar">
+                <div className="space-y-4 pr-2">
                   {data.unlocked_achievements.length > 0 ? (
                     data.unlocked_achievements.map((a: string, i: number) => (
                       <div key={i} className="flex items-center justify-between p-4 bg-gray-50/50 rounded-xl border border-gray-100 group hover:border-[#00A859]/30 transition-all shrink-0">
@@ -183,10 +183,10 @@ export default function Dashboard() {
                 </div>
               </div>
               
-              <div className="overflow-x-auto max-h-[500px] overflow-y-auto custom-scrollbar">
+              <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="text-left border-b border-gray-50 sticky top-0 bg-white z-[1]">
+                    <tr className="text-left border-b border-gray-50 bg-white z-[1]">
                       <th className="pb-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Transaction</th>
                       <th className="pb-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date</th>
                       <th className="pb-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Amount</th>

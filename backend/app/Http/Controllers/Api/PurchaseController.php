@@ -53,7 +53,7 @@ class PurchaseController extends Controller
 
         // Check if a new badge was unlocked during the event
         if ($user->badges()->count() > $initialBadgeCount) {
-            $latestBadge = $user->badges()->latest()->first();
+            $latestBadge = $user->badges()->orderByDesc('required_achievements')->first();
             $response['cashback'] = "Congratulations! You unlocked the {$latestBadge->name} badge and earned ₦300 cashback.";
         } else {
             $response['cashback'] = null;

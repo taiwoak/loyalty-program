@@ -1,6 +1,6 @@
 # Bumpa Loyalty Program
 
-A robust, brand-aligned loyalty management system featuring achievement tracking, tiered badge rewards, and an automated cashback system.
+This project implements a loyalty management system featuring achievement tracking, tiered badge rewards, and an automated cashback system.
 
 ## Getting Started
 

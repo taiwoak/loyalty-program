@@ -182,19 +182,29 @@ The `PurchaseController` validates the request and records the purchase in the d
 sequenceDiagram
     participant Frontend
     participant PurchaseController
+    participant AchievementController
     participant UserPurchaseEvent
     participant HandleUserPurchase
     participant BadgeUnlockedEvent
     participant HandleBadgeUnlocked
 
-    Frontend->>PurchaseController: POST /api/purchase
-    PurchaseController->>UserPurchaseEvent: Dispatch
-    UserPurchaseEvent->>HandleUserPurchase: Trigger
-    Note over HandleUserPurchase: Evaluate Achievement Thresholds
-    Note over HandleUserPurchase: Evaluate Badge Requirements
-    HandleUserPurchase->>BadgeUnlockedEvent: Dispatch
-    BadgeUnlockedEvent->>HandleBadgeUnlocked: Trigger
-    Note over HandleBadgeUnlocked: Award ₦300 Cashback & Log Transaction
+    rect rgb(240, 240, 240)
+        Note over Frontend, HandleBadgeUnlocked: 1. Purchase & Reward Processing (Event-Driven)
+        Frontend->>PurchaseController: POST /api/purchase
+        PurchaseController->>UserPurchaseEvent: Dispatch(User, Purchase)
+        UserPurchaseEvent->>HandleUserPurchase: handle()
+        Note over HandleUserPurchase: Evaluate achievement thresholds & badge levels
+        HandleUserPurchase->>BadgeUnlockedEvent: Dispatch(User, Badge)
+        BadgeUnlockedEvent->>HandleBadgeUnlocked: handle()
+        Note over HandleBadgeUnlocked: Credit ₦300 cashback & log transaction
+    end
+
+    rect rgb(230, 240, 255)
+        Note over Frontend, AchievementController: 2. Progress Retrieval (State Fetching)
+        Frontend->>AchievementController: GET /api/users/{user}/achievements
+        AchievementController->>AchievementController: Validate & Fetch user progress
+        AchievementController-->>Frontend: JSON: {unlocked_achievements, next_badge, current_badge, ...}
+    end
 ```
 
 ---

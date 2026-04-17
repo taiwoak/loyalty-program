@@ -145,6 +145,60 @@ A robust, brand-aligned loyalty management system featuring achievement tracking
 
 ---
 
+## Architectural Flow & Event-Driven System
+
+The system is built on a decoupled, event-driven architecture using Laravel's core features to ensure scalability and separation of concerns.
+
+### 1. Client Initiation (Frontend)
+A user performs an action (e.g., completes a purchase) on the React dashboard. This sends an authenticated `POST /api/purchase` request to the backend.
+
+### 2. Controller & Persistence
+The `PurchaseController` validates the request and records the purchase in the database. Instead of embedding reward logic directly in the controller, it dispatches a `UserPurchaseEvent`.
+
+### 3. Event Handling (The Observer Pattern)
+- **UserPurchaseEvent**: Fired immediately after a purchase is recorded. It acts as a signal that the user's purchase state has changed.
+- **HandleUserPurchase (Listener)**: Reacts to the purchase event:
+    - **Achievement Logic**: It checks if the user's total purchase count meets any `Achievement` thresholds (e.g., "1st Purchase"). If met, it attaches the achievement and fires an `AchievementUnlockedEvent`.
+    - **Badge Logic**: It then checks if the user's total achievement count qualifies them for a new `Badge` (e.g., "Beginner"). If a new badge is unlocked, it attaches it and fires a `BadgeUnlockedEvent`.
+
+### 4. Reward Execution
+- **HandleBadgeUnlocked (Listener)**: Listens specifically for when a user earns a new badge.
+    - **Cashback Trigger**: Upon a badge being unlocked, the system automatically triggers a **₦300 Cashback** payment.
+    - **Transaction Recording**: It increments the user's balance and logs a `cashback` type transaction for auditability and transparency.
+
+### Key Logic Components
+
+| Component | Responsibility |
+| :--- | :--- |
+| **UserPurchaseEvent** | Dispatched when a new purchase is successfully recorded. |
+| **AchievementUnlockedEvent** | Dispatched when a user reaches a specific achievement threshold. |
+| **BadgeUnlockedEvent** | Dispatched when a user qualifies for a new level/badge. |
+| **HandleUserPurchase** | Evaluates purchase counts and achievement progress to trigger rewards. |
+| **HandleBadgeUnlocked** | Processes the automated ₦300 cashback whenever a badge is unlocked. |
+
+### Implementation Summary Flow
+
+```mermaid
+sequenceDiagram
+    participant Frontend
+    participant PurchaseController
+    participant UserPurchaseEvent
+    participant HandleUserPurchase
+    participant BadgeUnlockedEvent
+    participant HandleBadgeUnlocked
+
+    Frontend->>PurchaseController: POST /api/purchase
+    PurchaseController->>UserPurchaseEvent: Dispatch
+    UserPurchaseEvent->>HandleUserPurchase: Trigger
+    Note over HandleUserPurchase: Evaluate Achievement Thresholds
+    Note over HandleUserPurchase: Evaluate Badge Requirements
+    HandleUserPurchase->>BadgeUnlockedEvent: Dispatch
+    BadgeUnlockedEvent->>HandleBadgeUnlocked: Trigger
+    Note over HandleBadgeUnlocked: Award ₦300 Cashback & Log Transaction
+```
+
+---
+
 ## Features
 - **Automated Cashback**: Logic-driven rewards triggered upon badge acquisition.
 - **Strict Validations**: Integer-based user validation and cross-user data protection.

@@ -7,7 +7,7 @@ A robust, brand-aligned loyalty management system featuring achievement tracking
 ### Prerequisites
 - PHP 8.2+ & Composer
 - Node.js 18+ & npm
-- SQLite (or your preferred database)
+- MySQL (or your preferred database)
 
 ---
 

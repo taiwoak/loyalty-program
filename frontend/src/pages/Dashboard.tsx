@@ -16,16 +16,20 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [purchaseLoading, setPurchaseLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [transactions, setTransactions] = useState<any[]>([]);
 
-  const fetchData = async () => {
+  const fetchData = async (page = 1) => {
     try {
       const [achievementsRes, transactionsRes] = await Promise.all([
         api.get(`/users/${userData.id}/achievements`),
-        api.get('/transactions')
+        api.get(`/transactions?page=${page}&limit=10`)
       ]);
       setData(achievementsRes.data);
       setTransactions(transactionsRes.data.data);
+      setCurrentPage(transactionsRes.data.page);
+      setTotalPages(transactionsRes.data.totalPages);
     } catch (err) {
       console.error(err);
     } finally {
@@ -46,6 +50,11 @@ export default function Dashboard() {
     navigate("/");
   };
 
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    fetchData(newPage);
+  };
+
   const makePurchase = async (e: React.FormEvent) => {
     e.preventDefault();
     setPurchaseLoading(true);
@@ -57,7 +66,7 @@ export default function Dashboard() {
         setBalance(res.data.balance);
       }
       
-      await fetchData();
+      await fetchData(1); // Reset to page 1 on new purchase
       
       if (res.data.cashback) {
         setMessage({ type: "success", text: res.data.cashback });
@@ -227,6 +236,43 @@ export default function Dashboard() {
                   </tbody>
                 </table>
               </div>
+
+              {/* Pagination UI */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between mt-10 pt-6 border-t border-gray-50">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    Page <span className="text-gray-900">{currentPage}</span> of <span className="text-gray-900">{totalPages}</span>
+                  </p>
+                  <div className="flex items-center space-x-3">
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all ${
+                        currentPage === 1 
+                        ? 'border-gray-100 text-gray-300 cursor-not-allowed' 
+                        : 'border-gray-200 text-gray-600 hover:border-[#00A859] hover:text-[#00A859]'
+                      }`}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all ${
+                        currentPage === totalPages 
+                        ? 'border-gray-100 text-gray-300 cursor-not-allowed' 
+                        : 'border-gray-200 text-gray-600 hover:border-[#00A859] hover:text-[#00A859]'
+                      }`}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

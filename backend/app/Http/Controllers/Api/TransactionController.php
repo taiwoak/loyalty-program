@@ -12,7 +12,7 @@ class TransactionController extends Controller
     {
         $limit = $request->query('limit', 20);
         $transactions = Transaction::where('user_id', $request->user()->id)
-            ->latest()
+            ->orderByDesc('id')
             ->paginate($limit);
 
         return response()->json([
